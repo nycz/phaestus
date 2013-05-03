@@ -48,16 +48,24 @@ getdata raw_lines =
     getPostAddress :: String -> (String, String)
     getPostAddress rawLine =
         case rawzipcode of
-            "" -> (toTitle . unpack $ strip $ pack rawLine, "-1")
-            _  -> (unpack . strip $ replace (pack rawzipcode) (pack "") (pack rawLine),
+            "" -> (fix $ pack rawLine, "-1")
+            _  -> (fix $ replace (pack rawzipcode) (pack "") (pack rawLine),
                   (filter (/= ' ') rawzipcode))
       where
+        fix = toTitle . unpack . strip
         rawzipcode = rawLine =~ "([0-9] ?){5}"
 
+    getDate rawLine =
+        (take 4 line) ++ "-" ++ (drop 4 $ take 6 line) ++ "-" ++
+            (drop 6 $ take 8 line)
+      where
+        line = filter (/= ' ') . take 15 $ rawLine
+
+    -- Generate the shit
     name = killspace $ raw_lines !! 4
     address = getAddress $ raw_lines !! 5
     (postaddress, zipcode) = getPostAddress $ raw_lines !! 6
-    date = raw_lines !! 0
+    date = getDate $ raw_lines !! 0
     membernr = "1234"
     confidence = "no"
     unchanged = "very much"
