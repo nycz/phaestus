@@ -24,7 +24,7 @@ doshit raw_str = (intercalate "\n" (getdata raw_str))
 getdata :: [String] -> [String]
 getdata raw_lines =
     [ name, address, zipcode, postaddress, date
-    , membernr, certainty, unchanged, payment, message ]
+    , membernr, confidence, unchanged, payment, message ]
   where
     toTitle :: String -> String
     toTitle str = (toUpper $ head str) : (map toLower $ tail str)
@@ -45,7 +45,6 @@ getdata raw_lines =
       where
         streetNum = rawLine =~ "[^0-9]([0-9] ?)+[a-zA-Z]? ?([lL] ?[gG] ?[hH] ?([0-9] ?)*)?$"
 
-
     getPostAddress :: String -> (String, String)
     getPostAddress rawLine =
         case rawzipcode of
@@ -60,7 +59,7 @@ getdata raw_lines =
     (postaddress, zipcode) = getPostAddress $ raw_lines !! 6
     date = raw_lines !! 0
     membernr = "1234"
-    certainty = "no"
+    confidence = "no"
     unchanged = "very much"
     payment = "24987"
     message = unlines . drop 7 $ init raw_lines
