@@ -56,8 +56,8 @@ getdata raw_lines =
         rawzipcode = rawLine =~ "([0-9] ?){5}"
 
     getDate rawLine =
-        (take 4 line) ++ "-" ++ (drop 4 $ take 6 line) ++ "-" ++
-            (drop 6 $ take 8 line)
+        (take 4 line) ++ "-" ++ (slice 4 6 line) ++ "-" ++
+            (slice 6 8 line)
       where
         line = filter (/= ' ') . take 15 $ rawLine
 
@@ -70,8 +70,9 @@ getdata raw_lines =
     confidence = "no"
     unchanged = "very much"
     payment = "24987"
-    message = unlines . drop 7 $ init raw_lines
+    message = unlines $ slice 7 (-1) raw_lines
 
-
-    --unpack $ toLower $ Text.tail str
---toUpper $ head str ++
+slice :: Int -> Int -> [a] -> [a]
+slice start end x
+    | end < 0   = drop start $ take (length x + end) x
+    | otherwise = drop start $ take end x
