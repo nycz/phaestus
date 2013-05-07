@@ -19,7 +19,7 @@ main = putStrLn (doshit ["2 0 1 2 0 5 0 7",
                          "AVSER REFERENS 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 URSP.BEL SEK 3 5 0 , 0 0 S I D A 1 ( 1 )"])
 
 doshit :: [String] -> String
-doshit raw_str = (intercalate "\n" (getdata raw_str))
+doshit raw_str = (unlines (getdata raw_str))
 
 getdata :: [String] -> [String]
 getdata rawLines =
@@ -27,13 +27,12 @@ getdata rawLines =
     , membernr, confidence, unchanged, payment, message ]
   where
     toTitle :: String -> String
-    toTitle str = (toUpper $ head str) : (map toLower $ tail str)
+    toTitle (x:xs) = toUpper x : map toLower xs
 
     killspace :: String -> String
     killspace str = intercalate ", " $
-        [unwords . map (toTitle . filter (/= ' ')) .
-         getAllTextMatches $
-         x =~ "(([^ ]( |$))+)|([^ ]+)" | x <- splitOn "," str]
+        map (unwords . map(toTitle . filter (/= ' ')) . getAllTextMatches .
+        (=~ "(([^ ]( |$))+)|([^ ]+)")) (splitOn "," str)
 
     getAddress :: String -> String
     getAddress rawLine =
@@ -47,11 +46,11 @@ getdata rawLines =
     getPostAddress :: String -> (String, String)
     getPostAddress rawLine =
         case rawzipcode of
-            "" -> (fix $ pack rawLine, "-1")
-            _  -> (fix $ replace (pack rawzipcode) (pack "") (pack rawLine),
+            "" -> (f $ pack rawLine, "-1")
+            _  -> (f $ replace (pack rawzipcode) (pack "") (pack rawLine),
                   (filter (/= ' ') rawzipcode))
       where
-        fix = toTitle . unpack . strip
+        f = toTitle . unpack . strip
         rawzipcode = rawLine =~ "([0-9] ?){5}"
 
     getDate :: String -> String
